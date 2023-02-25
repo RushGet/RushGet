@@ -1,0 +1,12 @@
+[toolchain]
+channel = "nightly"
+# Add other rustup components you may need here
+components = ["rustfmt", "clippy"]
+
+#[target.'cfg(unix)']
+## Add target-specific options here
+#rustflags = ["-C", "link-args=-Wl,-rpath,$ORIGIN/lib"]
+#
+#[target.'cfg(windows)']
+## Add target-specific options here
+#rustflags = ["-C", "link-args=/NODEFAULTLIB:msvcrt.lib"]

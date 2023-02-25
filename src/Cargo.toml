@@ -1,0 +1,11 @@
+[workspace]
+# Add any workspace-level options here
+members = [
+    "dockermir",
+]
+
+[profile.release]
+# Add any release-specific options here
+opt-level = 3
+debug = false
+lto = true
