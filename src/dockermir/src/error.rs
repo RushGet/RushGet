@@ -23,4 +23,9 @@ pub enum DockermirError {
         image: String,
         error: String,
     },
+    #[error("failed to download file from url: {url}, error: {error}")]
+    GithubReleaseDownloadError {
+        url: String,
+        error: String,
+    },
 }

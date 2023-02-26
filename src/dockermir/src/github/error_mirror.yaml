@@ -3,8 +3,8 @@ version: "0.1.0"
 description: "mirror from newbe36524, thanks to aliyun docker registry"
 github:
   mirrors:
-    - name: "github.abskoop.workers.dev"
-      replace_template: "https://github.abskoop.workers.dev/${release_url}"
+    - name: "baidu"
+      replace_template: "https://www.baidu.com/${release_url}"
 docker:
   ruleset:
     - name: "mirror hosted in aliyun by newbe36524"

@@ -106,7 +106,7 @@ impl ConfigLoader {
         config
     }
 
-    pub(crate) async fn load_config(&self, option: &LoadConfigOptions) -> anyhow::Result<RushGetConfig, DockermirError> {
+    pub(crate) async fn load_config(&self, option: LoadConfigOptions) -> anyhow::Result<RushGetConfig, DockermirError> {
         // load config from remote url
         if option.remote_config_url.is_some() {
             let remote_config_url = option.remote_config_url.as_ref().unwrap();

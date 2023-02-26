@@ -1,7 +1,6 @@
 use log::LevelFilter;
 use rstest::*;
 use crate::components::config::DEFAULT_CONFIG_YAML;
-use crate::docker::MirrorRegistry;
 use super::*;
 
 #[fixture]
@@ -35,8 +34,8 @@ fn init_logger() {
 "registry.cn-hangzhou.aliyuncs.com/newbe36524/vscode_rust:0")]
 fn map_success(init_logger: (), #[case]source: &str, #[case]expected: &str) {
     let loader = ConfigLoader::default();
-    let config = loader.load_config_yaml(&DEFAULT_CONFIG_YAML).unwrap();
-    let result = MirrorRegistry::map_mirror_by_configuration(source, &config);
+    let config = loader.load_config_yaml(DEFAULT_CONFIG_YAML).unwrap();
+    let result = map_mirror_by_configuration(source, &config);
     assert!(result.is_ok(), "Failed to map image: {}, error: {}", source, result.err().unwrap());
     let result = result.unwrap();
     assert_eq!(result.mirror_image, expected);
@@ -47,8 +46,9 @@ pub const JSON1_YAML: &str = include_str!("json1.yaml");
 #[rstest]
 fn map_failed(init_logger: ()) {
     let loader = ConfigLoader::default();
+    info!("{}",JSON1_YAML);
     let config = loader.load_config_yaml(JSON1_YAML).unwrap();
     let source = "mcr.microsoft.com/java/jdk:15u2-zulu-ubuntu-18.04";
-    let result = MirrorRegistry::map_mirror_by_configuration(source, &config);
+    let result = map_mirror_by_configuration(source, &config);
     assert!(result.is_err());
 }
