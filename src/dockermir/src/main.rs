@@ -3,17 +3,18 @@ extern crate log;
 
 use clap::{Command, Parser, Subcommand};
 
-mod registry;
-mod docker_exec;
-mod config;
 mod error;
+mod components;
+mod docker;
 
 use anyhow::Result;
 use log::LevelFilter;
 use thiserror::Error;
+use docker::{GetImageMirrorOptions, MirrorRegistry};
 use error::DockermirError;
-use crate::registry::{GetImageMirrorOptions, MirrorRegistry};
-use crate::docker_exec::{DockerExec, DockermirPullInput};
+use crate::components::docker_exec::{DockerExec, DockermirPullInput};
+use crate::components::RushGetTask;
+use crate::docker::{DockerCheckTask, DockerPullTask};
 
 /// Tool to help you to pull docker images from mirror instead of mcr.microsoft.com or docker.io
 #[derive(Parser, Debug)]
@@ -86,50 +87,25 @@ async fn run() -> Result<(), DockermirError> {
     }
 
     trace!("cli: {:?}", cli);
-
-    match &cli.command {
-        Some(Commands::Pull { image, remote_config_url, local_config_path }) => {
-            let registry = MirrorRegistry::new();
-            let mirror_image = registry.get_image_mirror(GetImageMirrorOptions {
-                image: image.to_string(),
-                remote_config_url: remote_config_url.to_owned(),
-                local_config_path: local_config_path.to_owned(),
-            }).await?;
-            info!("Pull image: {} from mirror: {}", image, &mirror_image.mirror_image);
-            trace!("hit ruleset: {:?}", &mirror_image.hit_ruleset);
-            trace!("hit rule: {:?}", &mirror_image.hit_rule);
-            let exec = DockerExec::new();
-            exec.pull(&DockermirPullInput::new(image.to_string(), mirror_image.mirror_image.to_owned()))?;
-            exec.tag(&DockermirPullInput::new(image.to_string(), mirror_image.mirror_image.to_owned()))?;
-            exec.rmi(&mirror_image.mirror_image)?;
-            info!("Successfully pull image: {}", image);
-            Ok(())
-        }
-        Some(Commands::Check { image, remote_config_url, local_config_path }) => {
-            let registry = MirrorRegistry::new();
-            let mirror_image = registry.get_image_mirror(GetImageMirrorOptions {
-                image: image.to_string(),
-                remote_config_url: remote_config_url.to_owned(),
-                local_config_path: local_config_path.to_owned(),
-            }).await;
-            match mirror_image {
-                Ok(mirror_image) => {
-                    info!("Image match, it will be pull from mirror: {}", &mirror_image.mirror_image);
-                    trace!("Image: {} is matched with ruleset: {:?}, rule: {:?}", image, &mirror_image.hit_ruleset, &mirror_image.hit_rule);
-                    Ok(())
-                }
-                Err(e) => {
-                    error!("Image: {} is not matched with any ruleset, error: {}", image, e);
-                    Ok(())
-                }
+    if let Some(command) = cli.command {
+        match command {
+            Commands::Pull { image, remote_config_url, local_config_path } => {
+                DockerPullTask::new(image.to_owned(), remote_config_url.to_owned(), local_config_path.to_owned())
+                    .run()
+                    .await
+            }
+            Commands::Check { image, remote_config_url, local_config_path } => {
+                DockerCheckTask::new(image.to_owned(), remote_config_url.to_owned(), local_config_path.to_owned())
+                    .run()
+                    .await
+            }
+            Commands::SelfUpdate { .. } => {
+                info!("Self update is not implemented yet, please visit https://github.com/newbe36524/Dockermir");
+                Ok(())
             }
         }
-        Some(Commands::SelfUpdate { .. }) => {
-            info!("Self update is not implemented yet, please visit https://github.com/newbe36524/Dockermir");
-        }
-        None => {
-            // show help
-            Ok(())
-        }
+    } else {
+        // TODO print help
+        Ok(())
     }
 }

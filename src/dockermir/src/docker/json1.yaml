@@ -1,0 +1,16 @@
+name: "mirror from newbe36524"
+version: "0.1.0"
+description: "mirror from newbe36524, thanks to aliyun docker registry"
+github:
+  mirrors:
+    - name: "github.abskoop.workers.dev"
+      url: "https://github.abskoop.workers.dev/${release_url}"
+docker:
+  ruleset:
+    - name: "mirror hosted in aliyun by newbe36524"
+      mirror_host: "registry.cn-hangzhou.aliyuncs.com"
+      mirror_namespace: "newbe36524"
+      rules:
+        - name: "mcr dotnet"
+          match_regex: "mcr\\.microsoft\\.com/dotnet/(.*):(.*)"
+          replace_template: "${mirror_host}/${mirror_namespace}/$1:$2"

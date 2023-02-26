@@ -5,26 +5,43 @@ use std::path::Path;
 use crate::error::DockermirError;
 
 #[derive(Debug, Deserialize, Clone)]
-pub(crate) struct Rule {
+pub(crate) struct DockerMirrorRule {
     pub(crate) name: String,
     pub(crate) match_regex: String,
     pub(crate) replace_template: String,
 }
 
 #[derive(Debug, Deserialize, Clone)]
-pub(crate) struct Ruleset {
+pub(crate) struct DockerMirrorRuleset {
     pub(crate) name: String,
     pub(crate) mirror_host: String,
     pub(crate) mirror_namespace: String,
-    pub(crate) rules: Vec<Rule>,
+    pub(crate) rules: Vec<DockerMirrorRule>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
-pub(crate) struct Config {
+pub(crate) struct RushGetGithubConfig {
+    pub(crate) mirrors: Vec<GithubMirror>,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub(crate) struct GithubMirror {
+    pub(crate) name: String,
+    pub(crate) replace_template: String,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub(crate) struct RushGetDockerConfig {
+    pub(crate) ruleset: Vec<DockerMirrorRuleset>,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub(crate) struct RushGetConfig {
     pub(crate) name: String,
     pub(crate) version: String,
     pub(crate) description: String,
-    pub(crate) ruleset: Vec<Ruleset>,
+    pub(crate) github: RushGetGithubConfig,
+    pub(crate) docker: RushGetDockerConfig,
 }
 
 #[derive(Debug, Default)]
@@ -38,19 +55,19 @@ pub struct LoadConfigOptions {
 pub struct ConfigLoader {}
 
 impl ConfigLoader {
-    fn load_config_json(&self, json_content: &str) -> anyhow::Result<Config> {
+    pub(crate) fn load_config_yaml(&self, yaml_content: &str) -> anyhow::Result<RushGetConfig> {
         // Parse the configuration from JSON into a Config struct
-        let config: Config = serde_json::from_str(&json_content)
+        let config: RushGetConfig = serde_yaml::from_str(&yaml_content)
             .expect("Failed to parse config file.");
 
         Ok(config)
     }
 
-    fn load_default_config(&self) -> Config {
-        self.load_config_json(DEFAULT_CONFIG_JSON).unwrap()
+    fn load_default_config(&self) -> RushGetConfig {
+        self.load_config_yaml(DEFAULT_CONFIG_YAML).unwrap()
     }
 
-    async fn load_config_from_remote_url(&self, url: &str) -> anyhow::Result<Config, DockermirError> {
+    async fn load_config_from_remote_url(&self, url: &str) -> anyhow::Result<RushGetConfig, DockermirError> {
         // send request to load config as json
         // Try to fetch the remote JSON config file
         let client = Client::new();
@@ -64,7 +81,7 @@ impl ConfigLoader {
                 let body = response.text().await;
                 if body.is_ok() {
                     trace!("Loaded config from remote url: {}, body is ok", url);
-                    let config = self.load_config_json(&body.unwrap());
+                    let config = self.load_config_yaml(&body.unwrap());
                     if config.is_ok() {
                         trace!("Loaded config from remote url: {}, config loaded is ok", url);
                         return Ok(config.unwrap());
@@ -81,15 +98,15 @@ impl ConfigLoader {
         return Err(DockermirError::FailedToLoadRemoteConfig(url.to_string()));
     }
 
-    fn load_config_file(&self, file_path: &str) -> anyhow::Result<Config> {
+    pub(crate) fn load_config_file(&self, file_path: &str) -> anyhow::Result<RushGetConfig> {
         // load config from file
         let config_file_content = fs::read_to_string(file_path)
             .expect("Failed to read config file.");
-        let config = self.load_config_json(&config_file_content);
+        let config = self.load_config_yaml(&config_file_content);
         config
     }
 
-    pub(crate) async fn load_config(&self, option: &LoadConfigOptions) -> anyhow::Result<Config, DockermirError> {
+    pub(crate) async fn load_config(&self, option: &LoadConfigOptions) -> anyhow::Result<RushGetConfig, DockermirError> {
         // load config from remote url
         if option.remote_config_url.is_some() {
             let remote_config_url = option.remote_config_url.as_ref().unwrap();
@@ -134,5 +151,5 @@ impl ConfigLoader {
     }
 }
 
-const DEFAULT_CONFIG_FILE_PATH: &str = "config.json";
-pub const DEFAULT_CONFIG_JSON: &str = include_str!("full.json");
+const DEFAULT_CONFIG_FILE_PATH: &str = "rushget.yaml";
+pub const DEFAULT_CONFIG_YAML: &str = include_str!("default_config.yaml");

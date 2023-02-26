@@ -1,6 +1,16 @@
+use log::LevelFilter;
 use rstest::*;
-use crate::config::DEFAULT_CONFIG_JSON;
+use crate::components::config::DEFAULT_CONFIG_YAML;
+use crate::docker::MirrorRegistry;
 use super::*;
+
+#[fixture]
+fn init_logger() {
+    let _ = env_logger::builder()
+        .filter_level(LevelFilter::Trace)
+        .is_test(true)
+        .try_init();
+}
 
 #[rstest]
 #[case("mcr.microsoft.com/dotnet/runtime-deps:6.0-alpine-arm64v8",
@@ -23,18 +33,22 @@ use super::*;
 "registry.cn-hangzhou.aliyuncs.com/newbe36524/vscode_base:0-alpine-3.11")]
 #[case("mcr.microsoft.com/vscode/devcontainers/rust:0",
 "registry.cn-hangzhou.aliyuncs.com/newbe36524/vscode_rust:0")]
-fn map_success(#[case]source: &str, #[case]expected: &str) {
-    let loader = ConfigLoader::new();
-    let config = loader.load_config_json(&DEFAULT_CONFIG_JSON).unwrap();
+fn map_success(init_logger: (), #[case]source: &str, #[case]expected: &str) {
+    let loader = ConfigLoader::default();
+    let config = loader.load_config_yaml(&DEFAULT_CONFIG_YAML).unwrap();
     let result = MirrorRegistry::map_mirror_by_configuration(source, &config);
-    assert_eq!(result, Ok(expected.to_string()));
+    assert!(result.is_ok(), "Failed to map image: {}, error: {}", source, result.err().unwrap());
+    let result = result.unwrap();
+    assert_eq!(result.mirror_image, expected);
 }
 
+pub const JSON1_YAML: &str = include_str!("json1.yaml");
+
 #[rstest]
-fn map_failed() {
-    let loader = ConfigLoader::new();
-    let config = loader.load_config_file("./src/docker/json1.json").unwrap();
+fn map_failed(init_logger: ()) {
+    let loader = ConfigLoader::default();
+    let config = loader.load_config_yaml(JSON1_YAML).unwrap();
     let source = "mcr.microsoft.com/java/jdk:15u2-zulu-ubuntu-18.04";
     let result = MirrorRegistry::map_mirror_by_configuration(source, &config);
-    assert_eq!(result.is_err(), true);
+    assert!(result.is_err());
 }
