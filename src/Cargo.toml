@@ -1,7 +1,7 @@
 [workspace]
 # Add any workspace-level options here
 members = [
-    "dockermir",
+    "rushget",
 ]
 
 [profile.release]

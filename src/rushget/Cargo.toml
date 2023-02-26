@@ -1,5 +1,5 @@
 [package]
-name = "dockermir"
+name = "rg"
 version = "0.1.0"
 authors = ["newbe36524 <newbe36524@qq.com>"]
 edition = "2021"
