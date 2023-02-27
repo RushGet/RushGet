@@ -29,7 +29,7 @@ jobs:
           command: build
           args: --target --release ${{ matrix.target }}
           use-cross: true
-          cross-version: cross = "0.2.5"
+          cross-version: 0.2.5
           directory: src
       - name: Build Release Binary
         run: |
