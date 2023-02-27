@@ -17,6 +17,8 @@ use crate::components::docker_exec::{DockerExec, DockermirPullInput};
 use crate::components::RushGetTask;
 use crate::docker::{DockerCheckTask, DockerPullTask};
 use crate::github::GithubReleaseTask;
+use appinsights::TelemetryClient;
+
 
 /// Tool to help you to pull docker images from mirror instead of mcr.microsoft.com or docker.io
 #[derive(Parser, Debug)]
@@ -94,6 +96,14 @@ async fn main() {
 }
 
 async fn run() -> Result<(), DockermirError> {
+
+    // configure telemetry client with default settings
+    let client = TelemetryClient::new("43f9dde8-9b5c-45b0-8a5a-075879fd7b6e".to_string());
+
+    // send event telemetry to the Application Insights server
+    client.track_event("Application started");
+
+
     let cli: Cli = Cli::parse();
 
     if let Some(level) = cli.verbose {
@@ -141,6 +151,9 @@ async fn run() -> Result<(), DockermirError> {
             Ok(())
         }
     };
+
+    // stop the client
+    client.close_channel().await;
     if result.is_ok() {
         info!("Success to run command: {:?}", &cli.command);
         Ok(())

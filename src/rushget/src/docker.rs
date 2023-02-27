@@ -64,7 +64,7 @@ impl RushGetTask for DockerCheckTask {
             }
             Err(e) => {
                 error!("Image: {} is not matched with any ruleset, error: {}", self.image, e);
-                Ok(())
+                Err(e)
             }
         }
     }

@@ -1,0 +1,66 @@
+name: Build and Release Rust Binary
+on:
+  push:
+    branches:
+      - release
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+      - name: Install Targets
+        run: rustup target add i686-pc-windows-gnu x86_64-apple-darwin aarch64-apple-darwin x86_64-unknown-linux-gnu
+      - name: Build Release Binary
+        run: cargo build --release --target i686-pc-windows-gnu --target x86_64-apple-darwin --target aarch64-apple-darwin --target x86_64-unknown-linux-gnu
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+      - name: Upload i686-pc-windows-gnu Binary
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./target/i686-pc-windows-gnu/release/rg.exe
+          asset_name: rg-i686-pc-windows-gnu.exe
+          asset_content_type: application/octet-stream
+      - name: Upload x86_64-apple-darwin Binary
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./target/x86_64-apple-darwin/release/rg
+          asset_name: rg-x86_64-apple-darwin
+          asset_content_type: application/octet-stream
+      - name: Upload aarch64-apple-darwin Binary
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./target/aarch64-apple-darwin/release/rg
+          asset_name: rg-aarch64-apple-darwin
+          asset_content_type: application/octet-stream
+      - name: Upload x86_64-unknown-linux-gnu Binary
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./target/x86_64-unknown-linux-gnu/release/rg
+          asset_name: rg-x86_64-unknown-linux-gnu
+          asset_content_type: application/octet-stream
