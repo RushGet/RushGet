@@ -27,9 +27,8 @@ jobs:
       - uses: ClementTsang/cargo-action@v0.0.3
         with:
           command: build
-          args: --target --release ${{ matrix.target }}
+          args: --release --target ${{ matrix.target }}
           use-cross: true
-          cross-version: 0.2.5
           directory: src
       - name: Build Release Binary
         run: |
