@@ -18,37 +18,14 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
-      # - name: Compile and release
-      #   uses: rust-build/rust-build.action@v1.4.2
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   with:
-      #     SRC_DIR: src
-      #     TOOLCHAIN_VERSION : nightly
-      #     RUSTTARGET: ${{ matrix.target }}
-      #     ARCHIVE_TYPES: ${{ matrix.archive }}
-      # - name: Setup Rust
-      #   uses: actions-rs/toolchain@v1
-      #   with:
-      #     toolchain: nightly
-      #     target: ${{ matrix.target }}
-      #     override: true
-      # - uses: ClementTsang/cargo-action@v0.0.3
-      #   with:
-      #     command: build
-      #     args: --release --target ${{ matrix.target }}
-      #     use-cross: true
-      #     directory: src
-      # - name: Build Release Binary
-      #   run: |
-      #     cd src
-      #     cargo build --release --target ${{ matrix.target }}
-      - name: Build-musl ${{ matrix.target }}
-        uses: shogan/rust-musl-action@master
+      - uses: dtolnay/rust-toolchain@stable
         with:
-          args: |
-            cd src
-            cargo build --target ${{ matrix.target }} --release
+          toolchain: nightly
+          targets: ${{ matrix.target }}
+      - run: |
+          cargo install cross
+          cd src
+          cross run --target ${{ matrix.target }} --release
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -65,6 +42,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./target/${{ matrix.target }}/release/my-binary
-          asset_name: my-binary-${{ matrix.target }}-${{ github.ref }}
+          asset_path: ./src/target/${{ matrix.target }}/release/rg
+          asset_name: rg-${{ matrix.target }}-${{ github.ref }}
           asset_content_type: application/octet-stream
