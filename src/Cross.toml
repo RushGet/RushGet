@@ -1,0 +1,3 @@
+# Cross.toml
+[target.aarch64-unknown-linux-gnu]
+pre-build = ["sudo apt install libssl-dev libsasl2-dev"]
