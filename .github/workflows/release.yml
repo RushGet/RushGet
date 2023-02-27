@@ -27,12 +27,12 @@ jobs:
       #     TOOLCHAIN_VERSION : nightly
       #     RUSTTARGET: ${{ matrix.target }}
       #     ARCHIVE_TYPES: ${{ matrix.archive }}
-      - name: Setup Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
-          target: ${{ matrix.target }}
-          override: true
+      # - name: Setup Rust
+      #   uses: actions-rs/toolchain@v1
+      #   with:
+      #     toolchain: nightly
+      #     target: ${{ matrix.target }}
+      #     override: true
       # - uses: ClementTsang/cargo-action@v0.0.3
       #   with:
       #     command: build
@@ -46,7 +46,9 @@ jobs:
       - name: Build-musl ${{ matrix.target }}
         uses: shogan/rust-musl-action@master
         with:
-          args: cargo build --target ${{ matrix.target }} --release
+          args: |
+            cd src
+            cargo build --target ${{ matrix.target }} --release
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
