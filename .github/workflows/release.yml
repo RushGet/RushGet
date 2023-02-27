@@ -22,9 +22,15 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
+          target: ${{ matrix.target }}
           override: true
-      - name: Install Targets
-        run: rustup target add ${{ matrix.target }}
+      - uses: ClementTsang/cargo-action@v0.0.3
+        with:
+          command: build
+          args: --target --release ${{ matrix.target }}
+          use-cross: true
+          cross-version: cross = "0.2.5"
+          directory: src
       - name: Build Release Binary
         run: |
           cd src
