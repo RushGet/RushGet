@@ -29,15 +29,15 @@ jobs:
           cd src
           export CARGO_INCREMENTAL=0
           export RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -Zpanic_abort_tests -Cpanic=abort"
-          export RUSTDOCFLAGS="-Cpanic=abort"
+          export RUSTDOCFLAGS="-C instrument-coverage"
           cargo build $CARGO_OPTIONS
           cargo test $CARGO_OPTIONS
-          zip -0 ccov.zip `find . \( -name rg.gc*" \) -print`
-          grcov ccov.zip -s . -t lcov --llvm --branch --ignore-not-existing --ignore "/*" -o lcov.info
+          grcov . --binary-path target/debug/deps/ -s . -t lcov --branch --ignore-not-existing --ignore '../**' --ignore '/*' -o coverage.lcov
+           
       - uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
-          files: src/lcov.info # optional
+          files: ./src/coverage.lcov # optional
           flags: unittests # optional
           name: codecov-umbrella # optional
           fail_ci_if_error: true # optional (default = false)
