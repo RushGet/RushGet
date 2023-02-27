@@ -30,7 +30,7 @@ jobs:
       - run: |
           cargo install cross
           cd src
-          cross build --target ${{ matrix.target }} --release -v
+          cross build --target ${{ matrix.target }} --release
           mv ./target/${{ matrix.target }}/release/${{ matrix.file_name }} ./${{ matrix.target }}-${{ matrix.file_name }}
       - name: Release
         uses: softprops/action-gh-release@v1

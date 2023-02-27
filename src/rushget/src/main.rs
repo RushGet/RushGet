@@ -1,7 +1,7 @@
 #[macro_use]
 extern crate log;
 
-use clap::{Command, Parser, Subcommand};
+use clap::{Parser, Subcommand};
 
 mod error;
 mod components;
@@ -10,10 +10,10 @@ mod github;
 
 use anyhow::Result;
 use log::LevelFilter;
-use thiserror::Error;
+
 use error::DockermirError;
 use crate::components::config::{ConfigLoader, LoadConfigOptions};
-use crate::components::docker_exec::{DockerExec, DockermirPullInput};
+
 use crate::components::RushGetTask;
 use crate::docker::{DockerCheckTask, DockerPullTask};
 use crate::github::GithubReleaseTask;

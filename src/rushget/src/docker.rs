@@ -2,7 +2,7 @@
 mod tests;
 
 use regex::Regex;
-use crate::components::config::{ConfigLoader, DockerMirrorRule, DockerMirrorRuleset, LoadConfigOptions, RushGetConfig};
+use crate::components::config::{DockerMirrorRule, DockerMirrorRuleset, RushGetConfig};
 use crate::components::docker_exec::{DockerExec, DockermirPullInput};
 use crate::components::RushGetTask;
 use crate::error::DockermirError;
