@@ -1,6 +1,7 @@
 # Cross.toml
 [target.aarch64-unknown-linux-gnu]
-pre-build = ["apt-get install --assume-yes libssl-dev libssl-dev:arm64 libsasl2-dev"]
+image = "x86_64-unknown-linux-gnu:main-centos"
+pre-build = ["apt-get install -y libssl-dev libsasl2-dev"]
 
 [target.x86_64-unknown-linux-gnu]
 pre-build = ["apt-get install -y libssl-dev libsasl2-dev"]
