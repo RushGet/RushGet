@@ -13,7 +13,7 @@ jobs:
           [
             "x86_64-unknown-linux-gnu",
             "aarch64-unknown-linux-gnu",
-            "x86_64-apple-darwin",
+            # "x86_64-apple-darwin",
             "x86_64-pc-windows-gnu",
           ]
     steps:
@@ -26,7 +26,7 @@ jobs:
       - run: |
           cargo install cross
           cd src
-          cross run --target ${{ matrix.target }} --release
+          cross build --target ${{ matrix.target }} --release -v
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
