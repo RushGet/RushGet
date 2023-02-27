@@ -32,10 +32,12 @@ jobs:
           export RUSTDOCFLAGS="-Cpanic=abort"
           cargo build $CARGO_OPTIONS
           cargo test $CARGO_OPTIONS
+          zip -0 ccov.zip `find . \( -name rg.gc*" \) -print`;
+          grcov ccov.zip -s . -t lcov --llvm --branch --ignore-not-existing --ignore "/*" -o lcov.info;
       - uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
-          files: src/coverage/*.lcov # optional
+          files: src/lcov.info # optional
           flags: unittests # optional
           name: codecov-umbrella # optional
           fail_ci_if_error: true # optional (default = false)
