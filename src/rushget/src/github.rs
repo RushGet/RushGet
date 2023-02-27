@@ -39,12 +39,12 @@ impl GithubReleaseTask {
             }
             let response = response.unwrap();
             if response.status().is_success() {
-                let mut file = File::create(file_name);
+                let file = File::create(file_name);
                 if file.is_err() {
                     return Err(format!("Failed to create file: {}", file_name));
                 }
                 let mut file = file.unwrap();
-                let mut bytes = response.bytes().await;
+                let bytes = response.bytes().await;
                 if bytes.is_err() {
                     return Err(format!("Failed to read bytes from response."));
                 }
