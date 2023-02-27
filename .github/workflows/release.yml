@@ -3,6 +3,10 @@ on:
   push:
     branches:
       - release
+
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -27,22 +31,9 @@ jobs:
           cargo install cross
           cd src
           cross build --target ${{ matrix.target }} --release -v
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        # if: startsWith(github.ref, 'refs/tags/')
         with:
-          tag_name: v${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: true
-          prerelease: true
-      - name: Upload Binary
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./src/target/${{ matrix.target }}/release/rg
-          asset_name: rg-${{ matrix.target }}-${{ github.ref }}
-          asset_content_type: application/octet-stream
+          files: |
+            ./src/target/${{ matrix.target }}/release/rg
