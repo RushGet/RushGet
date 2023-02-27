@@ -38,4 +38,4 @@ jobs:
         with:
           tag_name: v0.0.1
           files: |
-            ${{ matrix.target }}-${{ matrix.file_name }}
+            src/${{ matrix.target }}-${{ matrix.file_name }}

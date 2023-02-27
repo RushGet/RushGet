@@ -1,6 +1,6 @@
 # Cross.toml
 [target.aarch64-unknown-linux-gnu]
-image = "x86_64-unknown-linux-gnu:main-centos"
+image = "ghcr.io/cross-rs/x86_64-unknown-linux-gnu:main-centos"
 pre-build = ["apt-get install -y libssl-dev libsasl2-dev"]
 
 [target.x86_64-unknown-linux-gnu]
