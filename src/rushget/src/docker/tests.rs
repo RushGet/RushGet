@@ -1,6 +1,6 @@
 use log::LevelFilter;
 use rstest::*;
-use crate::components::config::DEFAULT_CONFIG_YAML;
+use crate::components::config::{ConfigLoader, DEFAULT_CONFIG_YAML};
 use super::*;
 
 #[fixture]
