@@ -23,3 +23,7 @@ appinsights = "0.2.3"
 [dev-dependencies]
 rstest = "0.16.0"
 async-std = { version = "1.12", features = ["attributes"] }
+
+[target.x86_64-apple-darwin]
+linker = "x86_64-apple-darwin14-clang"
+ar = "x86_64-apple-darwin14-ar"
