@@ -27,7 +27,11 @@ jobs:
           echo "$HOME/.local/bin" >> $GITHUB_PATH
       - run: |
           cd src
-          cargo test
+          export CARGO_INCREMENTAL=0
+          export RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -Zpanic_abort_tests -Cpanic=abort"
+          export RUSTDOCFLAGS="-Cpanic=abort"
+          cargo build $CARGO_OPTIONS
+          cargo test $CARGO_OPTIONS
       - uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
