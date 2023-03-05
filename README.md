@@ -1,1 +1,3 @@
-# Dockermir
+# RushGet
+
+see <https://rg.newbe.pro>
