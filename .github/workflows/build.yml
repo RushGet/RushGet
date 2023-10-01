@@ -34,7 +34,7 @@ jobs:
           cargo test $CARGO_OPTIONS
           grcov . --binary-path target/debug/deps/ -s . -t lcov --branch --ignore-not-existing --ignore '../**' --ignore '/*' -o coverage.lcov
            
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
           files: ./src/coverage.lcov # optional
