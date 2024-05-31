@@ -33,7 +33,7 @@ jobs:
           cross build --target ${{ matrix.target }} --release
           mv ./target/${{ matrix.target }}/release/${{ matrix.file_name }} ./${{ matrix.target }}-${{ matrix.file_name }}
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
